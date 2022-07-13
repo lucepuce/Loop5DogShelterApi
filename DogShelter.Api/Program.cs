@@ -1,4 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<DogContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DogContext") ?? throw new InvalidOperationException("Connection string 'DogContext' not found.")));
 
 // Add services to the container.
 
