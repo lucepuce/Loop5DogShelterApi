@@ -23,8 +23,9 @@ namespace DogShelter.Api.Controllers
       _context = context;
 
       var blobServiceClient = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=loop5storageaccount;AccountKey=cdJ3laNHQnFCRwkSPOfs5g7/xhwVV5PAFJACdAf3hgd9A7KR2x4z8oNW1HAqIbNU7QvIEo96uhac+AStPwQP6g==;EndpointSuffix=core.windows.net");
-      string containerName = "marcusoftnet" + Guid.NewGuid().ToString();
-      containerClient = blobServiceClient.CreateBlobContainer(containerName);
+      containerClient = blobServiceClient.GetBlobContainerClient("dogimages");
+      //string containerName = "marcusoftnet" + Guid.NewGuid().ToString();
+      //containerClient = blobServiceClient.CreateBlobContainer(containerName);
     }
 
     [HttpPost ("UploadDog")]
@@ -32,12 +33,22 @@ namespace DogShelter.Api.Controllers
     {
       string localFilePath = "./Pictures/golden-retriever-royalty-free-image-506756303-1560962726.jpeg";
       // Set filename for blob
-      string fileName = Guid.NewGuid().ToString() + ".gif";
-      var blobClient = containerClient.GetBlobClient(fileName);
+      //string fileName = Guid.NewGuid().ToString() + ".gif";
+      var blobClient = containerClient.GetBlobClient("dogs");
       Console.WriteLine("Uploading to Blob storage:\n\t {0}\n", blobClient.Uri);
       // Upload data from the local file
       await blobClient.UploadAsync(localFilePath, true);
       return Ok();
+    }
+
+    [HttpGet ("get the specific dog")]
+    public async Task<ActionResult> DownloadDog()
+    {
+        var blobClient = containerClient.GetBlobClient("dogs");
+        string downloadFilePath = "./Pictures/newDog.jpeg";
+        Console.WriteLine("\nDownloading blob to\n\t{0}\n", downloadFilePath);
+        var meme = await blobClient.DownloadToAsync(downloadFilePath);
+        return Ok(meme);
     }
 
     // GET: api/Dog
